@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4F46E5">
+    <title>Event Logger</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="./icon-192.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f3f4f6;
+            color: #111827;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        header {
+            background: #4F46E5;
+            color: white;
+            padding: 15px 20px;
+            margin: -20px -20px 20px -20px;
+            border-radius: 0 0 10px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #1f2937;
+        }
+
+        .btn {
+            background: #4F46E5;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #4338CA;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-large {
+            padding: 20px;
+            font-size: 20px;
+            margin: 20px 0;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+
+        .event-item {
+            border-left: 4px solid #4F46E5;
+            padding-left: 15px;
+        }
+
+        .event-type {
+            color: #4F46E5;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .event-note {
+            color: #4b5563;
+            margin: 5px 0;
+        }
+
+        .event-time {
+            color: #9ca3af;
+            font-size: 13px;
+        }
+
+        .link {
+            color: #4F46E5;
+            cursor: pointer;
+            text-decoration: underline;
+            background: none;
+            border: none;
+            font-size: inherit;
+            padding: 0;
+        }
+
+        .link:hover {
+            color: #4338CA;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .nav-btn {
+            background: white;
+            color: #4F46E5;
+            border: 2px solid #4F46E5;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .nav-btn:hover {
+            background: #eef2ff;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: 1px solid white;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+
+        .type-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .type-item:last-child {
+            border-bottom: none;
+        }
+
+        .delete-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .delete-btn:hover {
+            background: #b91c1c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Page -->
+        <div id="loginPage" class="page active">
+            <header>
+                <h1>Event Logger</h1>
+            </header>
+            <div class="card">
+                <h2>Login</h2>
+                <div id="loginError" class="error" style="display:none;"></div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn">Login</button>
+                </form>
+                <p style="margin-top: 15px; text-align: center;">
+                    <button class="link" onclick="showPage('registerPage')">Create an account</button> | 
+                    <button class="link" onclick="showPage('forgotPasswordPage')">Forgot password?</button>
+                </p>
+            </div>
+        </div>
+
+        <!-- Register Page -->
+        <div id="registerPage" class="page">
+            <header>
+                <h1>Event Logger</h1>
+            </header>
+            <div class="card">
+                <h2>Register</h2>
+                <div id="registerError" class="error" style="display:none;"></div>
+                <div id="registerSuccess" class="success" style="display:none;"></div>
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="registerName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="registerPassword" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn">Register</button>
+                    <button type="button" class="btn btn-secondary" onclick="showPage('loginPage')">Back to Login</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Forgot Password Page -->
+        <div id="forgotPasswordPage" class="page">
+            <header>
+                <h1>Event Logger</h1>
+            </header>
+            <div class="card">
+                <h2>Reset Password</h2>
+                <div id="forgotError" class="error" style="display:none;"></div>
+                <div id="forgotSuccess" class="success" style="display:none;"></div>
+                <form id="forgotPasswordForm">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="forgotEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input type="password" id="forgotNewPassword" required minlength="6">
+                    </div>
+                    <button type="submit" class="btn">Reset Password</button>
+                    <button type="button" class="btn btn-secondary" onclick="showPage('loginPage')">Back to Login</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="dashboardPage" class="page">
+            <header>
+                <h1>Event Logger</h1>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </header>
+            <div class="nav-menu">
+                <button class="nav-btn" onclick="showPage('dashboardPage')">Dashboard</button>
+                <button class="nav-btn" onclick="showPage('reportPage')">Reports</button>
+                <button class="nav-btn" onclick="showPage('manageTypesPage')">Manage Types</button>
+            </div>
+            <button class="btn btn-large" onclick="showPage('logEventPage')">📝 Log Event</button>
+            <div class="card">
+                <h2>Recent Events</h2>
+                <div id="recentEvents"></div>
+            </div>
+        </div>
+
+        <!-- Log Event Page -->
+        <div id="logEventPage" class="page">
+            <header>
+                <h1>Log Event</h1>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </header>
+            <div class="card">
+                <div id="logEventError" class="error" style="display:none;"></div>
+                <div id="logEventSuccess" class="success" style="display:none;"></div>
+                <form id="logEventForm">
+                    <div class="form-group">
+                        <label>Event Type</label>
+                        <select id="eventType" required>
+                            <option value="">Select event type...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Note</label>
+                        <textarea id="eventNote" placeholder="Add details about this event..."></textarea>
+                    </div>
+                    <button type="submit" class="btn">Log Event</button>
+                    <button type="button" class="btn btn-secondary" onclick="showPage('dashboardPage')">Cancel</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Manage Event Types Page -->
+        <div id="manageTypesPage" class="page">
+            <header>
+                <h1>Manage Event Types</h1>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </header>
+            <div class="nav-menu">
+                <button class="nav-btn" onclick="showPage('dashboardPage')">Dashboard</button>
+                <button class="nav-btn" onclick="showPage('reportPage')">Reports</button>
+                <button class="nav-btn" onclick="showPage('manageTypesPage')">Manage Types</button>
+            </div>
+            <div class="card">
+                <h2>Add New Type</h2>
+                <div id="typeError" class="error" style="display:none;"></div>
+                <div id="typeSuccess" class="success" style="display:none;"></div>
+                <form id="addTypeForm">
+                    <div class="form-group">
+                        <label>Type Name</label>
+                        <input type="text" id="newTypeName" required>
+                    </div>
+                    <button type="submit" class="btn">Add Type</button>
+                </form>
+            </div>
+            <div class="card">
+                <h2>Existing Types</h2>
+                <div id="typesList"></div>
+            </div>
+        </div>
+
+        <!-- Report Page -->
+        <div id="reportPage" class="page">
+            <header>
+                <h1>Event Reports</h1>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </header>
+            <div class="nav-menu">
+                <button class="nav-btn" onclick="showPage('dashboardPage')">Dashboard</button>
+                <button class="nav-btn" onclick="showPage('reportPage')">Reports</button>
+                <button class="nav-btn" onclick="showPage('manageTypesPage')">Manage Types</button>
+            </div>
+            <div class="card">
+                <div class="form-group">
+                    <label>Select Event Type</label>
+                    <select id="reportEventType" onchange="loadReport()">
+                        <option value="">Select event type...</option>
+                    </select>
+                </div>
+            </div>
+            <div id="reportResults"></div>
+            <div id="reportPagination" class="pagination" style="display:none;">
+                <button class="btn" onclick="previousReportPage()" id="prevReportBtn">Previous</button>
+                <button class="btn" onclick="nextReportPage()" id="nextReportBtn">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker registration failed'));
+        }
+    </script>
+</body>
+</html>
